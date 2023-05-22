@@ -17,7 +17,7 @@ public class lootTokens extends Task {
 
     @Override
     public boolean activate() {
-        return Util.needToLoot
+        return Vars.get().needToLoot
                 && Areas.WARRIOR_FIGHT_AREA.contains(Players.local())
                 && !Players.local().healthBarVisible()
                 && !Players.local().interacting().valid();
@@ -27,41 +27,32 @@ public class lootTokens extends Task {
     public void execute() {
         GroundItem tokens = GroundItems.stream().name(Constants.WARRIOR_GUILD_TOKEN).first();
         warriorMain.state("Looting armours and tokens...");
-        if (!Inventory.stream().name(Constants.CHOSEN_FULL_HELM).first().valid()) {
-            GroundItem helm = GroundItems.stream().name(Constants.CHOSEN_FULL_HELM).first();
-            if (helm.valid()) {
-                helm.interact("Take");
-                Condition.wait(() -> Inventory.stream().name(Constants.CHOSEN_FULL_HELM).first().valid(), 100, 50);
-            }
-        }
-        if (!Inventory.stream().name(Constants.CHOSEN_PLATEBODY).first().valid()) {
-            GroundItem body = GroundItems.stream().name(Constants.CHOSEN_PLATEBODY).first();
-            if (body.valid()) {
-                body.interact("Take");
-                Condition.wait(() -> Inventory.stream().name(Constants.CHOSEN_PLATEBODY).first().valid(), 100, 50);
-            }
-        }
-        if (!Inventory.stream().name(Constants.CHOSEN_PLATELEGS).first().valid()) {
-            GroundItem legs = GroundItems.stream().name(Constants.CHOSEN_PLATELEGS).first();
-            if (legs.valid()) {
-                legs.interact("Take");
-                Condition.wait(() -> Inventory.stream().name(Constants.CHOSEN_PLATELEGS).first().valid(), 100, 50);
-            }
-        }
+        lootItem(Constants.CHOSEN_FULL_HELM);
+        lootItem(Constants.CHOSEN_PLATEBODY);
+        lootItem(Constants.CHOSEN_PLATELEGS);
         if (tokens.valid()) {
-            tokens.interact("Take");
-            Vars.get().tokens_gained += tokens.stackSize();
-            Condition.wait(() -> !tokens.valid(), 100, 50);
+            if(tokens.interact("Take"))
+            {
+                Condition.wait(() -> !tokens.valid(), 100, 50);
+                Vars.get().tokens_gained += tokens.stackSize();
+            }
         }
-        Util.checkIfArmourReady();
-
-        if(!tokens.valid() && Util.HasArmour)
+        if(!tokens.valid() && Util.checkIfArmourReady())
         {
             warriorMain.state("Looted everything...");
             Util.checkIfReady();
-            Util.needToLoot = false;
-            Util.fightingAnimation = false;
+            Vars.get().needToLoot = false;
+            Vars.get().fightingAnimation = false;
         }
-
+    }
+    private void lootItem(String itemName){
+        if (Inventory.stream().name(itemName).isEmpty()) {
+            GroundItem item = GroundItems.stream().name(itemName).nearest().first();
+            if (item.valid()) {
+                if (item.interact("Take")) {
+                    Condition.wait(() -> Inventory.stream().name(itemName).isNotEmpty(), 100, 50);
+                }
+            }
+        }
     }
 }

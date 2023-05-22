@@ -31,7 +31,7 @@ public class withdrawPotionTask extends Task {
         System.out.println("Withdrawing pots...");
         if(Bank.withdraw(potID,Bank.Amount.TEN))
         {
-            if(Condition.wait(() -> Inventory.stream().id(potID).first().valid(), 100,50))
+            if(Condition.wait(() -> Inventory.stream().id(potID).isNotEmpty(), 100,50))
             {
                 System.out.println("Closing bank...");
                 if(Bank.close())

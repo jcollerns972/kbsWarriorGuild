@@ -1,9 +1,6 @@
 package kbsWarriorGuild.tasks;
 
-import kbsWarriorGuild.Areas;
-import kbsWarriorGuild.Task;
-import kbsWarriorGuild.Util;
-import kbsWarriorGuild.warriorMain;
+import kbsWarriorGuild.*;
 import org.powbot.api.Condition;
 import org.powbot.api.rt4.Movement;
 import org.powbot.api.rt4.Players;
@@ -19,8 +16,8 @@ public class walkToBank extends Task {
     @Override
     public boolean activate() {
         return !Areas.WARRIOR_BANK_AREA.contains(Players.local())
-        && Util.needToBank
-        && !Util.needToLoot;
+        && Vars.get().needToBank
+        && !Vars.get().needToLoot;
     }
 
     @Override

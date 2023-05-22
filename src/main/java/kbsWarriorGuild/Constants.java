@@ -1,9 +1,9 @@
 package kbsWarriorGuild;
 
 public class Constants {
-    public static final String CHOSEN_FULL_HELM = "Mithril full helm";
-    public static final String CHOSEN_PLATEBODY = "Mithril platebody" ;
-    public static final String CHOSEN_PLATELEGS = "Mithril platelegs";
+    public static String CHOSEN_FULL_HELM = null;
+    public static String CHOSEN_PLATEBODY = null;
+    public static String CHOSEN_PLATELEGS = null;
     public static final String WARRIOR_GUILD_TOKEN = "Warrior guild token";
     public static final String BRONZE_DEFENDER = "Bronze defender";
     public static final String IRON_DEFENDER = "Iron defender";
@@ -15,8 +15,6 @@ public class Constants {
     public static final String DRAGON_DEFENDER = "Dragon defender";
     public static final String PRAYER_POTION = "Prayer potion(4)";
     public static String food;
-    //public static String potion;
-    public static int amountOfPrayerPots;
     public static boolean useFood;
     public static boolean usePrayerPotion;
 

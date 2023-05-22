@@ -23,42 +23,18 @@ import java.util.concurrent.Callable;
         author = "bloki")
 @ScriptConfiguration.List(
         {
-                @ScriptConfiguration(name = "StartupMessage" , description = "Please start with an empty inventory",
+                @ScriptConfiguration(name = "StartupMessage" , description = "Please start with 21 free inventory slots...",
                         optionType = OptionType.INFO),
-//                @ScriptConfiguration(name = "MinimizeMessage" , description = "Minimize at the top right to change weapons",
-//                        optionType = OptionType.INFO),
+                @ScriptConfiguration(name = "Type Of Armour", description = "What armour do you want to animate?",
+                        optionType = OptionType.STRING,defaultValue =
+                        "",allowedValues = {"","Bronze","Iron","Steel","Black","Mithril","Adamant","Rune"}),
                 @ScriptConfiguration(name = "Food List", description = "Type of food?",
                         optionType = OptionType.STRING,defaultValue =
-                        "",allowedValues = {"","Shark","Trout","Anglerfish","Salmon","addmorelater"}),
+                        "",allowedValues = {"","Trout","Salmon","Tuna","Lobster","Bass","Swordfish","Shark","Anglerfish","Manta ray"}),
                 @ScriptConfiguration(name = "Prayer", description = "Use Prayer?", optionType = OptionType.BOOLEAN),
-//                @ScriptConfiguration(name = "amountOfPots", description = "How many prayer potions to withdraw?",
-//                        optionType = OptionType.INTEGER, visible = false),
-//                @ScriptConfiguration(name = "typeOfArmour", description = "What armour do you want to animate??",
-//                        OptionType.STRING,defaultValue =
-//                        "",allowedValues = {"","Mithril","Iron","Adamant","addmorelater"}),
-//                @ScriptConfiguration(name = "amountOfPots", description = "How many prayer potions to withdraw?",
-//                        optionType = OptionType.INTEGER, visible = false),
-//                @ScriptConfiguration(name = "useSpec", description = "Use Spec?", optionType = OptionType.BOOLEAN),
-//                @ScriptConfiguration(name = "whatSpecWep", description = "Click here to select weapons...",
-//                        optionType = OptionType.EQUIPMENT, visible = false),
-//                @ScriptConfiguration(name = "chosenSpecWep", description = "This is your chosen spec weapon...",
-//                        optionType = OptionType.STRING, visible = false),
         })
 
 public class warriorMain extends AbstractScript {
-//    @ValueChanged(keyName = "Prayer")
-//    public void prayerChanged(Boolean valuePassed) {
-//        updateVisibility("amountOfPots", valuePassed);
-//    }
-//    @ValueChanged(keyName = "useSpec")
-//    public void specChanged(Boolean valuePassed) {
-//        updateVisibility("whatSpecWep", valuePassed);
-//        updateVisibility("chosenSpecWep", valuePassed);
-//    }
-//    @ValueChanged(keyName = "chosenSpecWep")
-//    public void whatSpecWep(HashMap valuePassed) {
-//        System.out.println("wepChosen is: " + Equipment.itemAt(Equipment.Slot.MAIN_HAND));
-//    }
     private static String currentState = "null";
     private final static String currentIP = "localhost:5555";
     @Override
@@ -66,22 +42,16 @@ public class warriorMain extends AbstractScript {
         super.onStart();
         Constants.food  = getOption("Food List");
         warriorMain.state("Food to eat is: " + Constants.food);
-        //Constants.amountOfPrayerPots = getOption("amountOfPots");
-        //Constants.typeOfArmour = getOption("typeOfArmour");
         Constants.usePrayerPotion = getOption("Prayer");
-        Constants.amountOfPrayerPots = 3;
         warriorMain.state("usePrayer: " + Constants.usePrayerPotion);
-//        Constants.useSpec = getOption("useSpec");
-//        warriorMain.state("useSpec: " + Constants.useSpec);
-//        LinkedHashMap eq = getOption("whatSpecWep");
-//        warriorMain.state("LinkedHashMap = " + eq);
-//        warriorMain.state("whatSpecWep: " + eq.get(3));
+        Constants.typeOfArmour = getOption("Type Of Armour");
         if(Constants.usePrayerPotion)
         {
+            Vars.get().amountOfPrayerPots = 3;
             Vars.get().taskList.add(new drinkPrayPot(this));
             Vars.get().taskList.add(new usePrayer(this));
         }
-        warriorMain.state("amount of prayer potions: " + Constants.amountOfPrayerPots);
+        warriorMain.state("amount of prayer potions: " + Vars.get().amountOfPrayerPots);
         drawPaint();
         startRequirements();
         addTasks();
@@ -101,7 +71,7 @@ public class warriorMain extends AbstractScript {
         if(e.getNpc().index() == Vars.get().last_attacked_npc  && e.getAnimation() == 4167)
         {
             Vars.get().armours_killed++;
-            Util.needToLoot = true;
+            Vars.get().needToLoot = true;
         }
 //        Npc actor = e.getNpc();
 //        if(actor.valid()) {
@@ -114,22 +84,19 @@ public class warriorMain extends AbstractScript {
         {
             Vars.get().total_tokens = Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).count(true);
         }
-        if(Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).first().valid())
+        if(Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).isNotEmpty())
         {
-            if(Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).count(true) < 50)
+            if(Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).count(true) < 120)
             {
-                if(Util.hasEnoughTokens){
-                    Util.hasEnoughTokens = false;
+                if(Vars.get().hasEnoughTokens){
+                    Vars.get().hasEnoughTokens = false;
                 }
             }
-        }
-        if(Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).first().valid())
-        {
             if(Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).count(true) > Vars.get().tokens_to_fight_giant)
             {
-                if(!Util.hasEnoughTokens)
+                if(!Vars.get().hasEnoughTokens)
                 {
-                    Util.hasEnoughTokens = true;
+                    Vars.get().hasEnoughTokens = true;
                 }
             }
         }
@@ -137,19 +104,17 @@ public class warriorMain extends AbstractScript {
     public void addTasks()
     {
         Vars.get().taskList.add(new eat(this));
-        Vars.get().taskList.add(new fightAnimation(this));
         Vars.get().taskList.add(new lootTokens(this));
         Vars.get().taskList.add(new useBank(this));
         Vars.get().taskList.add(new walkToBank(this));
         Vars.get().taskList.add(new walkToAnimatorArea(this));
         Vars.get().taskList.add(new withdrawSupplies(this));
         Vars.get().taskList.add(new useAnimator(this));
-        Vars.get().taskList.add(new fightRuneGiants(this));
         Vars.get().taskList.add(new lootDefenders(this));
         Vars.get().taskList.add(new walkToRuneGiantArea(this));
         Vars.get().taskList.add(new resetDefenderRoom(this));
         Vars.get().taskList.add(new walkToDragonGiantArea(this));
-        Vars.get().taskList.add(new fightDragonGiants(this));
+        Vars.get().taskList.add(new attackCyclops(this));
         Vars.get().taskList.add(new checkAutoRetaliate(this));
     }
     
@@ -165,12 +130,6 @@ public class warriorMain extends AbstractScript {
                 .x(55)
                 .build();
     }
-//    @ValueChanged(keyName = "chosenSpecWep")
-//    public void whatSpecWep(LinkedHashMap valuePassed) {
-//        Item weapon = Equipment.itemAt(Equipment.Slot.MAIN_HAND);
-//        System.out.println("weapon is: " + weapon);
-//        System.out.println("valuepassed is: " + valuePassed);
-//    }
     @Override
     public void poll() {
         for ( Task t: Vars.get().taskList) {
@@ -190,7 +149,7 @@ public class warriorMain extends AbstractScript {
     public void startRequirements()
     {
         Util.checkPlayer();
-        //Util.checkLocation();
+        Util.handleChosenArmour();
         Util.checkIfUseFood();
         Util.checkIfUsePrayerPotion();
         Util.checkEnoughTokens();
@@ -206,10 +165,6 @@ public class warriorMain extends AbstractScript {
         Paint paint = PaintBuilder.newBuilder()
                 .x(10)
                 .y(10)
-//                .trackSkill(Skill.Attack)
-//                .trackSkill(Skill.Strength)
-//                .trackSkill(Skill.Defence)
-//                .trackSkill(Skill.Hitpoints)
                 .addString("Status: ", new Callable<String>() {
                     @Override
                     public String call() throws Exception {
@@ -238,27 +193,32 @@ public class warriorMain extends AbstractScript {
                 }).addString("readyToFightAnimation: ", new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        return String.valueOf(Util.readyToFightAnimations);
+                        return String.valueOf(Vars.get().readyToFightAnimations);
                     }
-                }).addString("readyToFightGiant: ", new Callable<String>() {
+                }).addString("readyToFightRuneGiant: ", new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        return String.valueOf(Util.readyToFightRuneGiants);
+                        return String.valueOf(Vars.get().readyToFightRuneGiants);
+                    }
+                }).addString("readyToFightDragonGiant: ", new Callable<String>() {
+                    @Override
+                    public String call() throws Exception {
+                        return String.valueOf(Vars.get().readyToFightDragonGiants);
                     }
                 }).addString("needToLoot: ", new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        return String.valueOf(Util.needToLoot);
+                        return String.valueOf(Vars.get().needToLoot);
                     }
                 }).addString("needToBank: ", new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        return String.valueOf(Util.needToBank);
+                        return String.valueOf(Vars.get().needToBank);
                     }
                 }).addString("needToResetRoom: ", new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        return String.valueOf(Util.needToResetRoom);
+                        return String.valueOf(Vars.get().needToResetRoom);
                     }
                 }).addString("Current defender: ", new Callable<String>() {
                     @Override
@@ -275,45 +235,10 @@ public class warriorMain extends AbstractScript {
                     public String call() throws Exception {
                         return String.valueOf(Constants.usePrayerPotion);
                     }
-                }).addString("hasBronze: ", new Callable<String>() {
+                }).addString("typeOfArmour: ", new Callable<String>() {
                     @Override
                     public String call() throws Exception {
-                        return String.valueOf(Constants.bronzeCompleted);
-                    }
-                }).addString("hasIron: ", new Callable<String>() {
-                    @Override
-                    public String call() throws Exception {
-                        return String.valueOf(Constants.ironCompleted);
-                    }
-                }).addString("hasSteel: ", new Callable<String>() {
-                    @Override
-                    public String call() throws Exception {
-                        return String.valueOf(Constants.steelCompleted);
-                    }
-                }).addString("hasBlack: ", new Callable<String>() {
-                    @Override
-                    public String call() throws Exception {
-                        return String.valueOf(Constants.blackCompleted);
-                    }
-                }).addString("hasMith: ", new Callable<String>() {
-                    @Override
-                    public String call() throws Exception {
-                        return String.valueOf(Constants.mithCompleted);
-                    }
-                }).addString("hasAddy: ", new Callable<String>() {
-                    @Override
-                    public String call() throws Exception {
-                        return String.valueOf(Constants.addyCompleted);
-                    }
-                }).addString("hasRune: ", new Callable<String>() {
-                    @Override
-                    public String call() throws Exception {
-                        return String.valueOf(Constants.runeCompleted);
-                    }
-                }).addString("hasDragon: ", new Callable<String>() {
-                    @Override
-                    public String call() throws Exception {
-                        return String.valueOf(Constants.dragonCompleted);
+                        return String.valueOf(Constants.typeOfArmour);
                     }
                 })
                 .build();

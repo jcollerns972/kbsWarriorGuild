@@ -18,7 +18,7 @@ public class drinkPrayPot extends Task {
     @Override
     public boolean activate() {
         return Prayer.prayerPoints() < 12
-                && Inventory.stream().nameContains("Prayer potion").action("Drink").count() > 0;
+                && Inventory.stream().nameContains("Prayer potion").isNotEmpty();
     }
 
     @Override
@@ -32,11 +32,6 @@ public class drinkPrayPot extends Task {
                     if(Condition.wait(()-> Prayer.prayerPoints() > 25,50,20))
                     {
                         warriorMain.state("Drank ppot...");
-                        if(Npcs.stream().interactingWithMe().isNotEmpty())
-                        {
-                            Npc npc = Npcs.stream().interactingWithMe().first();
-                            npc.interact("Attack");
-                        }
                     }
                     if (Areas.RUNE_GIANT_FIGHT_AREA.contains(Players.local())
                             || Areas.DRAGON_GIANT_FIGHT_AREA.contains(Players.local())) {

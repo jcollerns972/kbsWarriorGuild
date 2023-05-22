@@ -1,9 +1,7 @@
 package kbsWarriorGuild.tasks;
 
+import kbsWarriorGuild.*;
 import kbsWarriorGuild.Constants;
-import kbsWarriorGuild.Task;
-import kbsWarriorGuild.Util;
-import kbsWarriorGuild.warriorMain;
 import org.powbot.api.Condition;
 import org.powbot.api.rt4.*;
 
@@ -29,16 +27,14 @@ public class eat extends Task {
             {
                 if(food.interact("Eat"))
                 {
-                    if(Condition.wait(()-> Players.local().healthPercent() > 50,50,20))
+                    if(Condition.wait(()-> Players.local().healthPercent() > 50,50,100))
                     {
                         warriorMain.state("Food Eaten...");
-                        if(Npcs.stream().interactingWithMe().isNotEmpty())
-                        {
-                            Npc npc = Npcs.stream().interactingWithMe().first();
-                            npc.interact("Attack");
-                        }
                     }
-                    Util.checkIfReady();
+                    if (Areas.RUNE_GIANT_FIGHT_AREA.contains(Players.local())
+                            || Areas.DRAGON_GIANT_FIGHT_AREA.contains(Players.local())) {
+                        Util.checkIfReady();
+                    }
                 }
             }
     }

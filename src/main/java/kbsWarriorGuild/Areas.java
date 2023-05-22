@@ -4,8 +4,8 @@ import org.powbot.api.Area;
 import org.powbot.api.Tile;
 
 public class Areas {
-    public static Area DRAGON_GIANT_FIGHT_AREA =  new Area(new Tile(2912, 9973, 0), new Tile(2940, 9957, 0));;
-    public static Area RUNE_GIANT_FIGHT_AREA = new Area(
+    public static final Area DRAGON_GIANT_FIGHT_AREA =  new Area(new Tile(2912, 9973, 0), new Tile(2940, 9957, 0));;
+    public static final Area RUNE_GIANT_FIGHT_AREA = new Area(
         new Tile(2851, 3555, 2),
         new Tile(2872, 3555, 2),
         new Tile(2875, 3551, 2),

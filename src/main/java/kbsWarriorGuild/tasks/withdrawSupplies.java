@@ -18,109 +18,60 @@ public class withdrawSupplies extends Task {
     @Override
     public boolean activate() {
         return Areas.WARRIOR_BANK_AREA.contains(Players.local())
-        && Util.needToBank
+        && Vars.get().needToBank
         && Bank.opened()
-        && !Util.needToLoot;
+        && !Vars.get().needToLoot;
     }
 
     @Override
     public void execute() {
-        if(!Util.HasArmour)
-        {
-            if(!Inventory.stream().name(Constants.CHOSEN_FULL_HELM).first().valid())
-            {
-               if(!Bank.stream().name(Constants.CHOSEN_FULL_HELM).first().valid())
-                {
-                    warriorMain.state("Bank does not contain required items...");
-                    ScriptManager.INSTANCE.stop();
-                } else
-               {
-                   Bank.withdraw(Constants.CHOSEN_FULL_HELM, 1);
-                   if(Condition.wait(()-> Inventory.stream().name(Constants.CHOSEN_FULL_HELM).first().valid(),100,50))
-                   {
-                       warriorMain.state("Successfully withdrawn Full helm...");
-                   }
-               }
-            }
-            if(!Inventory.stream().name(Constants.CHOSEN_PLATEBODY).first().valid())
-            {
-                if(!Bank.stream().name(Constants.CHOSEN_PLATEBODY).first().valid())
-                {
-                    warriorMain.state("Bank does not contain required items...");
-                    ScriptManager.INSTANCE.stop();
-                } else
-                {
-                    Bank.withdraw(Constants.CHOSEN_PLATEBODY, 1);
-                    if(Condition.wait(()-> Inventory.stream().name(Constants.CHOSEN_PLATEBODY).first().valid(),100,50))
-                    {
-                        warriorMain.state("Successfully withdrawn Platebody...");
-                    }
-                }
-            }
-            if(!Inventory.stream().name(Constants.CHOSEN_PLATELEGS).first().valid())
-            {
-                if(!Bank.stream().name(Constants.CHOSEN_PLATELEGS).first().valid())
-                {
-                    warriorMain.state("Bank does not contain required items...");
-                    ScriptManager.INSTANCE.stop();
-                } else
-                {
-                    Bank.withdraw(Constants.CHOSEN_PLATELEGS, 1);
-                    if(Condition.wait(()-> Inventory.stream().name(Constants.CHOSEN_PLATELEGS).first().valid(),100,50))
-                    {
-                        warriorMain.state("Successfully withdrawn Platelegs...");
+        if (!Util.checkIfArmourReady()) {
+            String[] armourItems = {Constants.CHOSEN_FULL_HELM, Constants.CHOSEN_PLATEBODY, Constants.CHOSEN_PLATELEGS};
+            for (String item : armourItems) {
+                if (Inventory.stream().name(item).isEmpty()) {
+                    if (Bank.stream().name(item).isEmpty()) {
+                        warriorMain.state("Bank does not contain required items...");
+                        ScriptManager.INSTANCE.stop();
+                    } else {
+                        Bank.withdraw(item, 1);
+                        if (Condition.wait(() -> Inventory.stream().name(item).isNotEmpty(), 100, 50)) {
+                            warriorMain.state("Successfully withdrawn " + item + "...");
+                        }
                     }
                 }
             }
             Util.checkIfReady();
         }
-        if(!Util.HasFood)
-        {
-            if(Inventory.stream().name(Constants.food).first().valid())
-            {
-                warriorMain.state("Has food... Just not enough... Grabbing the rest");
-                long amountOfFood = Inventory.stream().name(Constants.food).count(true);
-                long amountToWithdraw = 10 - amountOfFood;
-                warriorMain.state("Food left: " + Bank.stream().name(Constants.food).count());
-                if(Bank.stream().name(Constants.food).count(true) < amountToWithdraw)
-                {
+        if (!Util.checkIfFoodReady()) {
+            int requiredFoodCount = 10;
+            long availableFoodCount = Inventory.stream().name(Constants.food).count(true);
+            if (availableFoodCount < requiredFoodCount) {
+                long amountToWithdraw = requiredFoodCount - availableFoodCount;
+                if (Bank.stream().name(Constants.food).count(true) < amountToWithdraw) {
                     warriorMain.state("Not enough food left... Shutting down.");
                     ScriptManager.INSTANCE.stop();
-                } else
-                {
+                } else {
                     warriorMain.state("Withdrawing " + amountToWithdraw + " " + Constants.food);
                     Bank.withdraw(Constants.food, (int) amountToWithdraw);
                 }
-            } else
-            {
-                if(Bank.stream().name(Constants.food).count(true) < 10)
-                {
-                    warriorMain.state("Not enough food left... Shutting down.");
-                    ScriptManager.INSTANCE.stop();
-                } else
-                {
-                    warriorMain.state("Withdrawing 10 " + Constants.food);
-                    Bank.withdraw(Constants.food, Bank.Amount.TEN);
-                }
             }
             Util.checkIfReady();
         }
-        if(Constants.usePrayerPotion)
-        {
+        if (Constants.usePrayerPotion) {
             warriorMain.state("Withdrawing prayer potions...");
-            if(!Util.HasPPot)
-            {
-                if(Bank.stream().name(Constants.PRAYER_POTION).count(true) < Constants.amountOfPrayerPots)
-                {
+
+            if (!Util.checkIfPpotReady()) {
+                int amountOfPrayerPots = Vars.get().amountOfPrayerPots;
+
+                if (Bank.stream().name(Constants.PRAYER_POTION).count(true) < amountOfPrayerPots) {
                     warriorMain.state("Not enough ppots left... Shutting down.");
                     ScriptManager.INSTANCE.stop();
-                } else
-                {
-                    warriorMain.state("Withdrawing " + Constants.amountOfPrayerPots + " " + Constants.PRAYER_POTION);
-                    Bank.withdraw(Constants.PRAYER_POTION, Constants.amountOfPrayerPots);
-                    if(Condition.wait(()-> Inventory.stream().nameContains("Prayer").action("Drink").count() > 0,100,50))
-                    {
-                        Util.HasPPot = true;
+                } else {
+                    warriorMain.state("Withdrawing " + amountOfPrayerPots + " " + Constants.PRAYER_POTION);
+                    Bank.withdraw(Constants.PRAYER_POTION, amountOfPrayerPots);
+
+                    if (Condition.wait(() -> Inventory.stream().nameContains("Prayer").action("Drink").count() > 0, 100, 50)) {
+                        warriorMain.state("Finished withdrawing ppots...");
                     }
                 }
                 Util.checkIfReady();

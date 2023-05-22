@@ -17,17 +17,13 @@ public class lootDefenders extends Task {
 
     @Override
     public boolean activate() {
-        return  GroundItems.stream().within(Players.local(),10).nameContains("defender").first().valid()
-                && Areas.RUNE_GIANT_FIGHT_AREA.contains(Players.local())
-                && !Inventory.isFull()
-        || GroundItems.stream().within(Players.local(),10).nameContains("defender").first().valid()
-                && Areas.DRAGON_GIANT_FIGHT_AREA.contains(Players.local())
-                && !Inventory.isFull();
+        return (Areas.RUNE_GIANT_FIGHT_AREA.contains(Players.local()) || Areas.DRAGON_GIANT_FIGHT_AREA.contains(Players.local()))
+                && GroundItems.stream().nameContains("defender").isNotEmpty();
     }
     @Override
     public void execute() {
-        Util.needToLoot = true;
-        GroundItem defender = GroundItems.stream().within(Players.local(),10).nameContains("defender").first();
+        Vars.get().needToLoot = true;
+        GroundItem defender = GroundItems.stream().nameContains("defender").first();
         warriorMain.state("Looting defender...");
         if (defender.valid()) {
             defender.interact("Take");
@@ -35,15 +31,14 @@ public class lootDefenders extends Task {
             Condition.wait(() -> !defender.valid(), 100, 50);
             Util.checkDefenderStatus();
         }
-
         if(!defender.valid()) //check ground for defenders...
         {
             warriorMain.state("Looted everything...");
             Util.checkIfReady();
-            Util.needToLoot = false;
+            Vars.get().needToLoot = false;
             if(!Constants.runeCompleted)
             {
-                Util.needToResetRoom = true;
+                Vars.get().needToResetRoom = true;
             }
         }
     }

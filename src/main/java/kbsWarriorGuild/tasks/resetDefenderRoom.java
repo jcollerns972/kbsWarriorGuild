@@ -15,7 +15,7 @@ public class resetDefenderRoom extends Task {
 
     @Override
     public boolean activate() {
-        return Util.needToResetRoom
+        return Vars.get().needToResetRoom
                 && Areas.RUNE_GIANT_FIGHT_AREA.contains(Players.local())
                 && !Constants.runeCompleted;
     }
@@ -27,7 +27,7 @@ public class resetDefenderRoom extends Task {
         if(Condition.wait(() -> Areas.RUNE_GIANT_WAIT_AREA.contains(Players.local()),100,50))
         {
             warriorMain.state("Successfully reset...");
-            Util.needToResetRoom = false;
+            Vars.get().needToResetRoom = false;
         }
 
     }

@@ -1,9 +1,6 @@
 package kbsWarriorGuild.tasks;
 
-import kbsWarriorGuild.Areas;
-import kbsWarriorGuild.Task;
-import kbsWarriorGuild.Util;
-import kbsWarriorGuild.warriorMain;
+import kbsWarriorGuild.*;
 import org.powbot.api.Condition;
 import org.powbot.api.rt4.Bank;
 import org.powbot.api.rt4.Players;
@@ -19,10 +16,10 @@ public class useBank extends Task {
     @Override
     public boolean activate() {
         return Areas.WARRIOR_BANK_AREA.contains(Players.local())
-                && Util.needToBank
+                && Vars.get().needToBank
                 && !Bank.opened()
-                && !Util.needToLoot
-                && !Util.fightingAnimation;
+                && !Vars.get().needToLoot
+                && !Vars.get().fightingAnimation;
     }
 
     @Override
@@ -33,6 +30,5 @@ public class useBank extends Task {
         {
             warriorMain.state("Bank open...");
         }
-
     }
 }

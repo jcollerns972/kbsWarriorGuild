@@ -1,9 +1,6 @@
 package kbsWarriorGuild.tasks;
 
-import kbsWarriorGuild.Areas;
-import kbsWarriorGuild.Task;
-import kbsWarriorGuild.Util;
-import kbsWarriorGuild.warriorMain;
+import kbsWarriorGuild.*;
 import org.powbot.api.Condition;
 import org.powbot.api.rt4.*;
 import org.powbot.mobile.script.ScriptManager;
@@ -18,12 +15,12 @@ public class useAnimator extends Task {
 
     @Override
     public boolean activate() {
-        return Util.readyToFightAnimations
+        return Vars.get().readyToFightAnimations
                 && Areas.WARRIOR_FIGHT_AREA.contains(Players.local())
-                && !Util.needToBank
+                && !Vars.get().needToBank
                 && Npcs.stream().interactingWithMe().isEmpty()
-                && !Util.needToLoot
-                && !Util.readyToFightRuneGiants;
+                && !Vars.get().needToLoot
+                && !Vars.get().readyToFightRuneGiants;
     }
 
     @Override
@@ -36,10 +33,11 @@ public class useAnimator extends Task {
                 warriorMain.state("Interacting with animator...");
                 if(animator.interact("Animate"))
                 {
-                    if(Condition.wait(() ->Npcs.stream().interactingWithMe().isNotEmpty(),100,50))
+                    //check in combat with animation just incase random event spawns and interacts and fucks everything
+                    if(Condition.wait(() -> Npcs.stream().interactingWithMe().list().toString().contains("Animated"),100,100))
                     {
                         warriorMain.state("In combat with armour....");
-                        Util.readyToFightAnimations = false;
+                        Vars.get().readyToFightAnimations = false;
                     }
                 }
             } else
@@ -48,7 +46,6 @@ public class useAnimator extends Task {
                 Camera.turnTo(animator);
                 Movement.step(animator);
                 Condition.wait(animator::inViewport,100,50);
-                //Condition.wait(animator::inViewport,100,50);
             }
         } else
         {

@@ -19,49 +19,38 @@ public class usePrayer extends Task {
     @Override
     public boolean activate() {
         return (Npcs.stream().interactingWithMe().isNotEmpty()
-                && Players.local().prayerHeadIconId() != 0
+                && !Prayer.prayerActive(Prayer.Effect.PROTECT_FROM_MELEE)
                 && Prayer.prayerPoints() > 0)
                 ||
                 (!Players.local().interacting().valid()
                 && !Players.local().healthBarVisible()
                 && !Npcs.stream().interactingWithMe().isNotEmpty()
-                && Players.local().prayerHeadIconId() == 0);
+                && Prayer.prayerActive(Prayer.Effect.PROTECT_FROM_MELEE));
     }
 
     @Override
     public void execute() {
-        if( Npcs.stream().interactingWithMe().isNotEmpty()
-                && Players.local().prayerHeadIconId() != 0
+        if(Npcs.stream().interactingWithMe().isNotEmpty()
+                && !Prayer.prayerActive(Prayer.Effect.PROTECT_FROM_MELEE)
                 && Prayer.prayerPoints() > 0)
         {
             warriorMain.state("Clicking melee prayer...");
-            if(Players.local().prayerHeadIconId() != 0)
+            if(!Prayer.prayerActive(Prayer.Effect.PROTECT_FROM_MELEE))
             {
                 Prayer.prayer(Prayer.Effect.PROTECT_FROM_MELEE, true);
-                Condition.wait(() -> Players.local().prayerHeadIconId() == 0, 100,20);
-            }
-        }
-        if( Players.local().interacting().valid()
-                && Players.local().prayerHeadIconId() != 0
-                && Prayer.prayerPoints() > 0)
-        {
-            warriorMain.state("Clicking melee prayer...");
-            if(Players.local().prayerHeadIconId() != 0)
-            {
-                Prayer.prayer(Prayer.Effect.PROTECT_FROM_MELEE, true);
-                Condition.wait(() -> Players.local().prayerHeadIconId() == 0, 100,20);
+                Condition.wait(() -> Prayer.prayerActive(Prayer.Effect.PROTECT_FROM_MELEE), 100,20);
             }
         }
         if(!Players.local().interacting().valid()
                 && !Players.local().healthBarVisible()
                 && !Npcs.stream().interactingWithMe().isNotEmpty()
-                && Players.local().prayerHeadIconId() == 0)
+                && Prayer.prayerActive(Prayer.Effect.PROTECT_FROM_MELEE))
         {
             warriorMain.state("Turning off melee prayer...");
-            if(Players.local().prayerHeadIconId() == 0)
+            if(Prayer.prayerActive(Prayer.Effect.PROTECT_FROM_MELEE))
             {
                 Prayer.prayer(Prayer.Effect.PROTECT_FROM_MELEE, false);
-                Condition.wait(() -> Players.local().prayerHeadIconId() != 0, 100,20);
+                Condition.wait(() -> !Prayer.prayerActive(Prayer.Effect.PROTECT_FROM_MELEE), 100,20);
             }
         }
     }
