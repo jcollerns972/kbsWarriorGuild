@@ -33,11 +33,11 @@ public class useAnimator extends Task {
                 warriorMain.state("Interacting with animator...");
                 if(animator.interact("Animate"))
                 {
-                    //check in combat with animation just incase random event spawns and interacts and fucks everything
-                    if(Condition.wait(() -> Npcs.stream().interactingWithMe().list().toString().contains("Animated"),100,100))
+                    if(Condition.wait(() -> Npcs.stream().interactingWithMe().nameContains("Animated").isNotEmpty(),100,100))
                     {
                         warriorMain.state("In combat with armour....");
                         Vars.get().readyToFightAnimations = false;
+                        Vars.get().last_time_animated = System.currentTimeMillis();
                     }
                 }
             } else

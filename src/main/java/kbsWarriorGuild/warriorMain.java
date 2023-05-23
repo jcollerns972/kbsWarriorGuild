@@ -36,10 +36,12 @@ import java.util.concurrent.Callable;
 
 public class warriorMain extends AbstractScript {
     private static String currentState = "null";
+    private ScriptManager scriptManager;
     private final static String currentIP = "localhost:5555";
     @Override
     public void onStart() {
         super.onStart();
+        scriptManager = ScriptManager.INSTANCE;
         Constants.food  = getOption("Food List");
         warriorMain.state("Food to eat is: " + Constants.food);
         Constants.usePrayerPotion = getOption("Prayer");
@@ -80,25 +82,14 @@ public class warriorMain extends AbstractScript {
     }
     @Subscribe
     public void onInventChange(InventoryChangeEvent evt){
-        if(Vars.get().total_tokens != Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).count(true))
-        {
-            Vars.get().total_tokens = Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).count(true);
+        long currentTokens = Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).count(true);
+        if (Vars.get().total_tokens != currentTokens) {
+            Vars.get().total_tokens = currentTokens;
         }
-        if(Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).isNotEmpty())
-        {
-            if(Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).count(true) < 120)
-            {
-                if(Vars.get().hasEnoughTokens){
-                    Vars.get().hasEnoughTokens = false;
-                }
-            }
-            if(Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).count(true) > Constants.tokens_to_fight_giant)
-            {
-                if(!Vars.get().hasEnoughTokens)
-                {
-                    Vars.get().hasEnoughTokens = true;
-                }
-            }
+        if (currentTokens < 120) {
+            Vars.get().hasEnoughTokens = false;
+        } else if (currentTokens > Constants.tokens_to_fight_giant) {
+            Vars.get().hasEnoughTokens = true;
         }
     }
     public void addTasks()
@@ -116,6 +107,7 @@ public class warriorMain extends AbstractScript {
         Vars.get().taskList.add(new walkToDragonGiantArea(this));
         Vars.get().taskList.add(new attackCyclops(this));
         Vars.get().taskList.add(new checkAutoRetaliate(this));
+        Vars.get().taskList.add(new fightAnimation(this));
     }
     
     public static void main(String[] args) {
@@ -132,17 +124,14 @@ public class warriorMain extends AbstractScript {
     }
     @Override
     public void poll() {
-        for ( Task t: Vars.get().taskList) {
-            if (t.activate()) {
-                if(ScriptManager.INSTANCE.isStopping()) {
-                    break;
-                } else{
-                    System.out.println("Performing Task: " + t.name);
-                    t.execute();
-                }
-            }
-            if(ScriptManager.INSTANCE.isStopping()) {
+        boolean isStopping = scriptManager.isStopping();
+        for (Task task : Vars.get().taskList) {
+            if (isStopping) {
                 break;
+            }
+            if (task.activate()) {
+                System.out.println("Performing Task: " + task.name);
+                task.execute();
             }
         }
     }

@@ -19,6 +19,7 @@ public class Vars {
     public boolean needToLoot;
     public boolean needToResetRoom;
     public boolean fightingAnimation;
+    public long last_time_animated;
 
     public static Vars get() {
         return vars == null ? vars = new Vars() : vars;

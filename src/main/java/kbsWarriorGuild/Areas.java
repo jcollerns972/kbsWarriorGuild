@@ -23,5 +23,5 @@ public class Areas {
     public static Area DRAGON_GIANT_WAIT_AREA = new Area(new Tile(2905, 9973, 0), new Tile(2910, 9967, 0));
     public static Area WARRIOR_FIGHT_AREA = new Area(new Tile(2849, 3545, 0), new Tile(2859, 3534, 0));
     public static Area WARRIOR_BANK_AREA = new Area(new Tile(2843, 3545, 0), new Tile(2847, 3537, 0));
-    public static Area WARRIOR_ANIMATOR_AREA = new Area(new Tile(2852, 3540, 0), new Tile(2850, 3544, 0));
+    public static Area WARRIOR_ANIMATOR_AREA = new Area(new Tile(2849, 3545, 0), new Tile(2859, 3534, 0));
 }

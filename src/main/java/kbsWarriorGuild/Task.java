@@ -7,7 +7,6 @@ public abstract class Task {
         super();
         name = "Un-named";
     }
-
     public abstract boolean activate();
     public abstract void execute();
 }
