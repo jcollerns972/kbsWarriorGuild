@@ -92,7 +92,7 @@ public class warriorMain extends AbstractScript {
                     Vars.get().hasEnoughTokens = false;
                 }
             }
-            if(Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).count(true) > Vars.get().tokens_to_fight_giant)
+            if(Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).count(true) > Constants.tokens_to_fight_giant)
             {
                 if(!Vars.get().hasEnoughTokens)
                 {

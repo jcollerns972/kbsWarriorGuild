@@ -13,7 +13,7 @@ public class Util {
     public static void checkEnoughTokens() {
         warriorMain.state("Checking if we have enough tokens to fight Giants");
         long tokenCount = Inventory.stream().name(Constants.WARRIOR_GUILD_TOKEN).count(true);
-        Vars.get().hasEnoughTokens = tokenCount > Vars.get().tokens_to_fight_giant;
+        Vars.get().hasEnoughTokens = tokenCount > Constants.tokens_to_fight_giant;
         warriorMain.state(Vars.get().hasEnoughTokens ? "We have enough tokens..." : "We do not have enough tokens...");
     }
 

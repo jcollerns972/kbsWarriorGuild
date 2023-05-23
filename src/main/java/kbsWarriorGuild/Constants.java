@@ -17,6 +17,7 @@ public class Constants {
     public static String food;
     public static boolean useFood;
     public static boolean usePrayerPotion;
+    public static int tokens_to_fight_giant = 750;
 
     public static boolean bronzeCompleted;
     public static boolean ironCompleted;

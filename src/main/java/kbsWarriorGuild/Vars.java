@@ -10,7 +10,6 @@ public class Vars {
     public int cyclops_killed;
     public int tokens_gained;
     public long total_tokens;
-    public int tokens_to_fight_giant = 750;
     public String currentDefender;
     public boolean hasEnoughTokens;
     public boolean needToBank;
