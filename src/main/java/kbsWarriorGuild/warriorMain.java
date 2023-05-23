@@ -27,10 +27,10 @@ import java.util.concurrent.Callable;
                         optionType = OptionType.INFO),
                 @ScriptConfiguration(name = "Type Of Armour", description = "What armour do you want to animate?",
                         optionType = OptionType.STRING,defaultValue =
-                        "",allowedValues = {"","Bronze","Iron","Steel","Black","Mithril","Adamant","Rune"}),
+                        "",allowedValues = {"Bronze","Iron","Steel","Black","Mithril","Adamant","Rune"}),
                 @ScriptConfiguration(name = "Food List", description = "Type of food?",
                         optionType = OptionType.STRING,defaultValue =
-                        "",allowedValues = {"","Trout","Salmon","Tuna","Lobster","Bass","Swordfish","Shark","Anglerfish","Manta ray"}),
+                        "",allowedValues = {"Trout","Salmon","Tuna","Lobster","Bass","Swordfish","Shark","Anglerfish","Manta ray"}),
                 @ScriptConfiguration(name = "Prayer", description = "Use Prayer?", optionType = OptionType.BOOLEAN),
         })
 

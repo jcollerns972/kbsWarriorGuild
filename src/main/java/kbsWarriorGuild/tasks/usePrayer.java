@@ -1,6 +1,5 @@
 package kbsWarriorGuild.tasks;
 
-import kbsWarriorGuild.Constants;
 import kbsWarriorGuild.Task;
 import kbsWarriorGuild.warriorMain;
 import org.powbot.api.Condition;
